@@ -1,0 +1,20 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="MainComponents" Directory="INSTALLDIR" >
+      <Files Include="ToInstall\Dlls\*.dll" Directory="INSTALLDIR" />
+      <Files Include="ToInstall\XMLs\*.xml" Directory="INSTALLDIR" />
+      <Component Guid="E0AE3AC2-0ECE-4759-8549-CCBBB84B7FDC">
+        <File Source="ToInstall\VisioAddInSharePoint.vsto" />
+        <File Source="ToInstall\VisioAddInSharePoint.dll.manifest" />
+      </Component>
+      <Component Id="RegistryEntries" Directory="TARGETDIR">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Visio\Addins\!(bind.Property.ProductName)">
+          <RegistryValue Name="Description" Value="!(bind.Property.ProductName)" Type="string" />
+          <RegistryValue Name="FriendlyName" Value="!(bind.Property.ProductName)" Type="string" />
+          <RegistryValue Name="LoadBehavior" Value="3" Type="integer" />
+          <RegistryValue Name="Manifest" Value="file:///[INSTALLDIR]!(bind.Property.ProductName).vsto|vstolocal" Type="string" />
+        </RegistryKey>
+      </Component>
+      </ComponentGroup>
+  </Fragment>
+</Wix>

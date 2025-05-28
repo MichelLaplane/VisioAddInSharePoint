@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <ribbon>
+    <tabs>
+      <tab id="tabVisualAddInSharePoint" label="VisualAddInSharePoint">
+        <group id="groupVisualAddInSharePoint"
+               label="SharePoint Access">
+          <button id="btnCSOM"
+                  label="CSOM"
+                  onAction="OnAction"
+                  size="large"
+                  imageMso="MasterDocumentLockSubdocument"/>
+          <button id="btnMsGraph"
+                  label="Microsoft Graph"
+                  onAction="OnAction"
+                  size="large"
+                  imageMso="AdpPrimaryKey"/>
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
+
