@@ -6,6 +6,7 @@ The solution comes with an installer that contains two files:
 - "Installation.msi"
 - "cab1.cab"
 To install the app, simply launch "Installation.msi".
+
 A dialog box appears:
 
 -![InstallStart](https://github.com/MichelLaplane/VisioAddInSharePoint/blob/master/VisioAddInSharePoint/Readme/InstallStart.png)
