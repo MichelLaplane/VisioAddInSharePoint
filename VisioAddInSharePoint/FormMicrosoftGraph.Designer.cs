@@ -74,7 +74,7 @@
       // 
       // btnCallGraphButton
       // 
-      this.btnCallGraphButton.Location = new System.Drawing.Point(464, 415);
+      this.btnCallGraphButton.Location = new System.Drawing.Point(545, 415);
       this.btnCallGraphButton.Name = "btnCallGraphButton";
       this.btnCallGraphButton.Size = new System.Drawing.Size(160, 23);
       this.btnCallGraphButton.TabIndex = 4;
@@ -90,20 +90,21 @@
       this.btnSignOut.TabIndex = 5;
       this.btnSignOut.Text = "Sign-Out";
       this.btnSignOut.UseVisualStyleBackColor = true;
+      this.btnSignOut.Visible = false;
       this.btnSignOut.Click += new System.EventHandler(this.btnSignOut_Click);
       // 
-      // Form1
+      // FormMicrosoftGraph
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(720, 450);
-      this.Controls.Add(this.btnSignOut);
       this.Controls.Add(this.btnCallGraphButton);
+      this.Controls.Add(this.btnSignOut);
       this.Controls.Add(this.labTokenInfoText);
       this.Controls.Add(this.labResultText);
       this.Controls.Add(this.edTokenInfoText);
       this.Controls.Add(this.edResultText);
-      this.Name = "Form1";
+      this.Name = "FormMicrosoftGraph";
       this.Text = "Form1";
       this.ResumeLayout(false);
       this.PerformLayout();

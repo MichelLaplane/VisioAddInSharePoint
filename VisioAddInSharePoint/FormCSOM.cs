@@ -29,7 +29,7 @@ namespace VisioAddInSharePoint
       edSharePointTenantID.Text = "";
       edSharePointTenantUrl.Text = "";
       edSharePointSiteUrl.Text = "";
-      edRootFolder.Text = "Documents partages";
+      edRootFolder.Text = "";
       //edParentLibrary.Text = "Documents";
       edParentFolderName.Text = "";
       }
@@ -95,7 +95,7 @@ namespace VisioAddInSharePoint
       var clientId = edClientApplicationID.Text;
       var tenantId = edSharePointTenantID.Text;
       var authority = $"https://login.microsoftonline.com/{tenantId}/";
-      var redirectUri = "";
+      var redirectUri = "http://localhost";
 
       string resource = $"{siteUrl.Scheme}://{siteUrl.Authority}";
 
