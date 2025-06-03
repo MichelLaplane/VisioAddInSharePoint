@@ -39,11 +39,11 @@
       this.labSharePointSiteUrl = new System.Windows.Forms.Label();
       this.edSharePointSiteUrl = new System.Windows.Forms.TextBox();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.labSharePointTenantUrl = new System.Windows.Forms.Label();
+      this.edSharePointTenantUrl = new System.Windows.Forms.TextBox();
       this.btnCreateFolder = new System.Windows.Forms.Button();
       this.edParentFolderName = new System.Windows.Forms.TextBox();
       this.labParentFolderName = new System.Windows.Forms.Label();
-      this.edSharePointTenantUrl = new System.Windows.Forms.TextBox();
-      this.labSharePointTenantUrl = new System.Windows.Forms.Label();
       this.edFolderToCreate = new System.Windows.Forms.TextBox();
       this.labFolderToCreate = new System.Windows.Forms.Label();
       this.groupBox1.SuspendLayout();
@@ -149,6 +149,22 @@
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Tenant and SharePoint site informations";
       // 
+      // labSharePointTenantUrl
+      // 
+      this.labSharePointTenantUrl.AutoSize = true;
+      this.labSharePointTenantUrl.Location = new System.Drawing.Point(10, 70);
+      this.labSharePointTenantUrl.Name = "labSharePointTenantUrl";
+      this.labSharePointTenantUrl.Size = new System.Drawing.Size(115, 13);
+      this.labSharePointTenantUrl.TabIndex = 11;
+      this.labSharePointTenantUrl.Text = "SharePoint Tenant Url:";
+      // 
+      // edSharePointTenantUrl
+      // 
+      this.edSharePointTenantUrl.Location = new System.Drawing.Point(133, 67);
+      this.edSharePointTenantUrl.Name = "edSharePointTenantUrl";
+      this.edSharePointTenantUrl.Size = new System.Drawing.Size(239, 20);
+      this.edSharePointTenantUrl.TabIndex = 12;
+      // 
       // btnCreateFolder
       // 
       this.btnCreateFolder.Location = new System.Drawing.Point(406, 374);
@@ -175,22 +191,6 @@
       this.labParentFolderName.TabIndex = 15;
       this.labParentFolderName.Text = "Parent folder name";
       // 
-      // edSharePointTenantUrl
-      // 
-      this.edSharePointTenantUrl.Location = new System.Drawing.Point(133, 67);
-      this.edSharePointTenantUrl.Name = "edSharePointTenantUrl";
-      this.edSharePointTenantUrl.Size = new System.Drawing.Size(239, 20);
-      this.edSharePointTenantUrl.TabIndex = 12;
-      // 
-      // labSharePointTenantUrl
-      // 
-      this.labSharePointTenantUrl.AutoSize = true;
-      this.labSharePointTenantUrl.Location = new System.Drawing.Point(10, 70);
-      this.labSharePointTenantUrl.Name = "labSharePointTenantUrl";
-      this.labSharePointTenantUrl.Size = new System.Drawing.Size(115, 13);
-      this.labSharePointTenantUrl.TabIndex = 11;
-      this.labSharePointTenantUrl.Text = "SharePoint Tenant Url:";
-      // 
       // edFolderToCreate
       // 
       this.edFolderToCreate.Location = new System.Drawing.Point(636, 402);
@@ -207,7 +207,7 @@
       this.labFolderToCreate.TabIndex = 15;
       this.labFolderToCreate.Text = "Folder name";
       // 
-      // Form1
+      // FormCSOM
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -222,8 +222,9 @@
       this.Controls.Add(this.edRootFolder);
       this.Controls.Add(this.btnSharePointFolders);
       this.Controls.Add(this.edResponse);
-      this.Name = "Form1";
+      this.Name = "FormCSOM";
       this.Text = "VisualSharePointCSOMSample";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormCSOM_FormClosing);
       this.groupBox1.ResumeLayout(false);
       this.groupBox1.PerformLayout();
       this.ResumeLayout(false);
