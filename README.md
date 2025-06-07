@@ -91,7 +91,7 @@ All is then set right.
 
 ![SetOk](https://github.com/MichelLaplane/VisioAddInSharePoint/blob/master/VisioAddInSharePoint/Readme/SetOk.png)
 
-Now tou need to add the user that will be granted the use of the application.
+Now you need to add the user that will be granted the use of the application.
 
 ![UsersAndGroup](https://github.com/MichelLaplane/VisioAddInSharePoint/blob/master/VisioAddInSharePoint/Readme/UsersAndGroup.png)
 

@@ -33,7 +33,6 @@
       this.labResultText = new System.Windows.Forms.Label();
       this.labTokenInfoText = new System.Windows.Forms.Label();
       this.btnCallGraphButton = new System.Windows.Forms.Button();
-      this.btnSignOut = new System.Windows.Forms.Button();
       this.SuspendLayout();
       // 
       // edResultText
@@ -82,24 +81,12 @@
       this.btnCallGraphButton.UseVisualStyleBackColor = true;
       this.btnCallGraphButton.Click += new System.EventHandler(this.btnCallGraphButton_Click);
       // 
-      // btnSignOut
-      // 
-      this.btnSignOut.Location = new System.Drawing.Point(630, 415);
-      this.btnSignOut.Name = "btnSignOut";
-      this.btnSignOut.Size = new System.Drawing.Size(75, 23);
-      this.btnSignOut.TabIndex = 5;
-      this.btnSignOut.Text = "Sign-Out";
-      this.btnSignOut.UseVisualStyleBackColor = true;
-      this.btnSignOut.Visible = false;
-      this.btnSignOut.Click += new System.EventHandler(this.btnSignOut_Click);
-      // 
       // FormMicrosoftGraph
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(720, 450);
       this.Controls.Add(this.btnCallGraphButton);
-      this.Controls.Add(this.btnSignOut);
       this.Controls.Add(this.labTokenInfoText);
       this.Controls.Add(this.labResultText);
       this.Controls.Add(this.edTokenInfoText);
@@ -117,7 +104,6 @@
     private System.Windows.Forms.Label labResultText;
     private System.Windows.Forms.Label labTokenInfoText;
     private System.Windows.Forms.Button btnCallGraphButton;
-    private System.Windows.Forms.Button btnSignOut;
     }
   }
 

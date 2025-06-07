@@ -1,6 +1,6 @@
 ﻿using Microsoft.Identity.Client;
-using Microsoft.Office.Server.Infrastructure;
 using Microsoft.Office.SharePoint.Tools;
+using Microsoft.Online.SharePoint.TenantAdministration;
 using Microsoft.SharePoint.Client;
 using Microsoft.Win32;
 
@@ -12,7 +12,10 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net;
+using System.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -30,7 +33,6 @@ namespace VisioAddInSharePoint
 
     void InitializeControl()
       {
-      // récupération du mode de fonctionnement
       regKey = Registry.CurrentUser;
       if ((regCompanyKey = regKey.CreateSubKey("Software\\ShareVisual")) != null)
         {
@@ -68,58 +70,51 @@ namespace VisioAddInSharePoint
     private async void btnSharePointFolders_Click(object sender, EventArgs e)
       {
       edResponse.Text += "\r\btnSharePointFolders_Click enter";
-      //Task.Run(() => AddFolderToLibrary()).Wait();
-      await AddFolderToLibrary();
+      await ListLibraryFolder();
       edResponse.Text += "\r\btnSharePointFolders_Click leave";
       }
 
-    public async Task AddFolderToLibrary()
+    public async Task ListLibraryFolder()
       {
       edResponse.Text += "\r\nAddFolderToLibrary enter";
+      var redirectUri = "http://localhost";
+      var siteUrl = edSharePointTenantUrl.Text + "/" + edSharePointSiteUrl.Text;
 
-      var siteUrl = new Uri(edSharePointTenantUrl.Text + "/" + edSharePointSiteUrl.Text);
-
-      var accessToken = await AcquireTokenAsync(siteUrl);
-      using (var clientContext = new ClientContext(siteUrl))
+      // Create an instance of the AuthenticationManager type
+      var authManager = PnP.Framework.AuthenticationManager.CreateWithInteractiveLogin(edClientApplicationID.Text,
+                                                                                       redirectUri, 
+                                                                                       edSharePointTenantID.Text);
+      using (var clientContext = await authManager.GetContextAsync(siteUrl))
         {
-        clientContext.ExecutingWebRequest += async (sender, e) =>
-          {
-            // Insert the access token in the request
-            e.WebRequestExecutor.RequestHeaders["Authorization"] = "Bearer " + accessToken;
-          };
         try
           {
           // Read web properties
           var web = clientContext.Web;
           clientContext.Load(web, w => w.Id, w => w.Title);
           await clientContext.ExecuteQueryAsync();
-          Debug.WriteLine($"{web.Id} - {web.Title}");
-          edResponse.Text += "\r\nWeb Site ID: " + web.Id + " Web Site Title" + web.Title;
+          edResponse.Text += $"\r\n{web.Id} - {web.Title}";
           // Read folders
           var folders = web.GetFolderByServerRelativeUrl(edRootFolder.Text);
           clientContext.Load(folders, d => d.Name);
           await clientContext.ExecuteQueryAsync();
-          Debug.WriteLine($"Folders : {folders.Name} ");
-          edResponse.Text += "\r\nFolders: " + folders.Name;
+          edResponse.Text += $"\r\nFolders : {folders.Name}";
           var files = folders.Files;
           clientContext.Load(files);
           await clientContext.ExecuteQueryAsync();
-          edResponse.Text += "\r\nFile count: " + files.Count;
+          edResponse.Text += $"\r\nFile count: {files.Count}";
           foreach (File file in files)
             {
-            Debug.WriteLine("\r\nFile Title: " + file.Name);
-            edResponse.Text += "\r\nFile Title: " + file.Name;
+            edResponse.Text += $"\r\nFile Title: {file.Name}";
             }
           }
         catch (Exception ex)
           {
           Debug.WriteLine("Error: " + ex.Message);
-          edResponse.Text += "\r\nError: " + ex.Message;
+          edResponse.Text += $"\r\nError: {ex.Message}";
           }
         }
       edResponse.Text += "\r\nAddFolderToLibrary leave";
       }
-
     private void FormCSOM_FormClosing(object sender, FormClosingEventArgs e)
       {
       regKey = Registry.CurrentUser;
@@ -137,106 +132,36 @@ namespace VisioAddInSharePoint
         }
       }
 
-    async Task<string> AcquireTokenAsync(Uri siteUrl)
+    private void btnProcesses_Click(object sender, EventArgs e)
       {
-      AuthenticationResult result = null;
-      var clientId = edClientApplicationID.Text;
-      var tenantId = edSharePointTenantID.Text;
-      var authority = $"https://login.microsoftonline.com/{tenantId}/";
-      var redirectUri = "http://localhost";
-
-      string resource = $"{siteUrl.Scheme}://{siteUrl.Authority}";
-
-      var scopes = new String[] { $"{resource}/.default" };
-      //      string[] scopes = new string[] { "user.read" };
-      // .WithDefaultRedirectUri()
-      edResponse.Text += "\r\nAcquireTokenAsync enter";
-
-      IPublicClientApplication publicClientApplication = PublicClientApplicationBuilder
-                      .Create(clientId)
-                      .WithTenantId(tenantId)
-                      .WithAuthority(authority)
-                      .WithRedirectUri(redirectUri)
-                      .Build();
-      try
+      Process tempProcess = Process.GetCurrentProcess();
+      foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
         {
-        edResponse.Text += "\r\nAcquireTokenAsync AcquireTokenInteractive";
-        result = await publicClientApplication
-            .AcquireTokenInteractive(scopes)
-            .ExecuteAsync();
+        edResponse.Text += "\r\nModule: " + module.ModuleName + "\t" + module.FileName;
         }
-      catch (Exception ex)
-        {
-        edResponse.Text += "\r\nAcquireTokenAsync exception" + ex.Message;
-        }
-      //catch (MsalUiRequiredException ex)
-      //  {
-      //  edResponse.Text += "\r\nAcquireTokenAsync AcquireTokenInteractive exception";
-      //  }
-      //IPublicClientApplication publicClientApplication = PublicClientApplicationBuilder
-      //                .Create(clientId)
-      //                .WithTenantId(tenantId)
-      //                .WithAuthority(authority)
-      //                .WithDefaultRedirectUri()
-      //                .Build();
-      //edResponse.Text += "\r\nAcquireTokenAsync after PublicClientApplicationBuilder creation";
+      }
 
-      AuthenticationResult tokenResult = null;
-
-      // Try to see if we already have an account in the cache
-      var account = await publicClientApplication.GetAccountsAsync().ConfigureAwait(false);
-      //edResponse.Text += "\r\nAcquireTokenAsync after account get";
-      try
-        {
-
-
-
-        Console.WriteLine($"Access Token: {result.AccessToken}");
-
-
-        // Try to get the token from the tokens cache
-        tokenResult = await publicClientApplication.AcquireTokenSilent(scopes, account.FirstOrDefault())
-            .ExecuteAsync().ConfigureAwait(false);
-        }
-      catch (MsalUiRequiredException)
-        {
-        //edResponse.Text += "\r\nAcquireTokenAsync catch (MsalUiRequiredException)";
-        // Try to get the token directly through AAD if it is not available in the tokens cache
-        try
-          {
-          //edResponse.Text += "\r\nAcquireTokenAsync before AcquireTokenInteractive";
-          tokenResult = await publicClientApplication.AcquireTokenInteractive(scopes)
-              .ExecuteAsync().ConfigureAwait(false);
-          }
-        catch (Exception except)
-          {
-          //edResponse.Text += "\r\nAcquireTokenInteractive exception" + except.Message;
-          }
-        }
-      //edResponse.Text += "\r\nAcquireTokenAsync leave";
-      return tokenResult != null ? tokenResult.AccessToken : null;
+    private void FormCSOM_Load(object sender, EventArgs e)
+      {
+      edResponse.SelectionTabs = new int[] { 350 };
       }
 
     private async void btnCreateFolder_Click(object sender, EventArgs e)
       {
-      List listLibrary = null;
-      FolderCollection colLibraryFolders = null;
-      Folder folderAdded;
+      var redirectUri = "http://localhost";
+      var siteUrl = edSharePointTenantUrl.Text + "/" + edSharePointSiteUrl.Text;
 
-      var siteUrl = new Uri(edSharePointTenantUrl.Text + "/" + edSharePointSiteUrl.Text);
-      var accessToken = await AcquireTokenAsync(siteUrl);
-      using (var clientContext = new ClientContext(siteUrl))
+      // Create an instance of the AuthenticationManager type
+      var authManager = PnP.Framework.AuthenticationManager.CreateWithInteractiveLogin(edClientApplicationID.Text,
+                                                                                       redirectUri,
+                                                                                       edSharePointTenantID.Text);
+      using (var clientContext = await authManager.GetContextAsync(siteUrl))
         {
-        clientContext.ExecutingWebRequest += async (senderCF, eCF) =>
-        {
-          // Insert the access token in the request
-          eCF.WebRequestExecutor.RequestHeaders["Authorization"] = "Bearer " + accessToken;
-        };
         try
           {
           FolderCollection folderCollection = clientContext.Web.GetFolderByServerRelativeUrl(edRootFolder.Text + "/" + edParentFolderName.Text).Folders;
           clientContext.Load(folderCollection);
-          clientContext.ExecuteQuery();
+          await clientContext.ExecuteQueryAsync();
           bool bFounded = false;
           if (folderCollection.Count != 0)
             {
@@ -253,34 +178,14 @@ namespace VisioAddInSharePoint
           if (bFounded == false)
             {
             folderCollection.Add(edFolderToCreate.Text);
-            clientContext.ExecuteQuery();
+            await clientContext.ExecuteQueryAsync();
             }
           }
         catch (Exception ex)
           {
-          Debug.WriteLine("Error: " + ex.Message);
           edResponse.Text += "\r\nError: " + ex.Message;
           }
         }
-      }
-
-    public List GetListByUrl(ClientContext clientContext, ListCollection lists, string strURL)
-      {
-      List listFolderList = null;
-
-      foreach (List curList in lists)
-        {
-        Folder curRoot = curList.RootFolder;
-        clientContext.Load(curRoot);
-        clientContext.ExecuteQuery();
-        if (curRoot.ServerRelativeUrl == strURL)
-          {
-          // On a trouvé la librairie
-          listFolderList = curList;
-          break;
-          }
-        }
-      return listFolderList;
       }
 
     }

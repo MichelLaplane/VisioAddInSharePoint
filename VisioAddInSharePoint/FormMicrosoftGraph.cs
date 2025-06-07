@@ -49,7 +49,6 @@ namespace VisioAddInSharePoint
     public FormMicrosoftGraph()
       {
       InitializeComponent();
-      //CreateApplication();
       }
 
     public static void CreateApplication()
@@ -87,48 +86,53 @@ namespace VisioAddInSharePoint
     private async void btnCallGraphButton_Click(object sender, EventArgs e)
       {
       AuthenticationResult authResult = null;
-      //var app = PublicClientApp;
       edResultText.Text = string.Empty;
       edTokenInfoText.Text = string.Empty;
 
       CreateApplication();
-
-      // if the user signed-in before, remember the account info from the cache
-      IAccount firstAccount = (await _clientApp.GetAccountsAsync()).FirstOrDefault();
-
-      // otherwise, try witht the Windows account
-      if (firstAccount == null)
-        {
-        firstAccount = PublicClientApplication.OperatingSystemAccount;
-        }
-
       try
         {
-        authResult = await _clientApp.AcquireTokenSilent(scopes, firstAccount)
-            .ExecuteAsync();
-        }
-      catch (MsalUiRequiredException ex)
-        {
-        // A MsalUiRequiredException happened on AcquireTokenSilent. 
-        // This indicates you need to call AcquireTokenInteractive to acquire a token
-        System.Diagnostics.Debug.WriteLine($"MsalUiRequiredException: {ex.Message}");
-
+        // if the user signed-in before, remember the account info from the cache
+        IAccount firstAccount = (await _clientApp.GetAccountsAsync()).FirstOrDefault();
+        // otherwise, try witht the Windows account
+        if (firstAccount == null)
+          {
+          firstAccount = PublicClientApplication.OperatingSystemAccount;
+          }
         try
           {
-          authResult = await _clientApp.AcquireTokenInteractive(scopes)
-              .WithAccount(firstAccount)
-              .WithParentActivityOrWindow(this.Handle) // optional, used to center the browser on the window
-              .WithPrompt(Prompt.SelectAccount)
+          authResult = await _clientApp.AcquireTokenSilent(scopes, firstAccount)
               .ExecuteAsync();
           }
-        catch (MsalException msalex)
+        catch (MsalUiRequiredException ex)
           {
-          edResultText.Text = $"Error Acquiring Token:{System.Environment.NewLine}{msalex}";
+          // A MsalUiRequiredException happened on AcquireTokenSilent. 
+          // This indicates you need to call AcquireTokenInteractive to acquire a token
+          edResultText.Text += "\r\nError MsalUiRequiredException: " + ex.Message;
+          System.Diagnostics.Debug.WriteLine($"MsalUiRequiredException: {ex.Message}");
+
+          try
+            {
+            authResult = await _clientApp.AcquireTokenInteractive(scopes)
+                .WithAccount(firstAccount)
+                .WithParentActivityOrWindow(this.Handle) // optional, used to center the browser on the window
+                .WithPrompt(Prompt.SelectAccount)
+                .ExecuteAsync();
+            }
+          catch (MsalException msalex)
+            {
+            edResultText.Text = $"Error MsalException Acquiring Token:{System.Environment.NewLine}{msalex}";
+            }
+          }
+        catch (Exception ex)
+          {
+          edResultText.Text = $"Error Exception Acquiring Token Silently:{System.Environment.NewLine}{ex}";
+          return;
           }
         }
       catch (Exception ex)
         {
-        edResultText.Text = $"Error Acquiring Token Silently:{System.Environment.NewLine}{ex}";
+        edResultText.Text = $"Error Exception:{System.Environment.NewLine}{ex}";
         return;
         }
 
@@ -136,31 +140,8 @@ namespace VisioAddInSharePoint
         {
         edResultText.Text = await GetHttpContentWithToken(graphAPIEndpoint, authResult.AccessToken);
         DisplayBasicTokenInfo(authResult);
-        //this.SignOutButton.Visibility = Visibility.Visible;
         }
       }
-
-    ///// <summary>
-    ///// Sign out the current user
-    ///// </summary>
-    //private async void SignOutButton_Click(object sender, RoutedEventArgs e)
-    //  {
-    //  var accounts = await App.PublicClientApp.GetAccountsAsync();
-    //  if (accounts.Any())
-    //    {
-    //    try
-    //      {
-    //      await App.PublicClientApp.RemoveAsync(accounts.FirstOrDefault());
-    //      this.ResultText.Text = "User has signed-out";
-    //      this.CallGraphButton.Visibility = Visibility.Visible;
-    //      this.SignOutButton.Visibility = Visibility.Collapsed;
-    //      }
-    //    catch (MsalException ex)
-    //      {
-    //      ResultText.Text = $"Error signing-out user: {ex.Message}";
-    //      }
-    //    }
-    //  }
 
     /// <summary>
     /// Perform an HTTP GET request to a URL using an HTTP Authorization header
@@ -200,25 +181,5 @@ namespace VisioAddInSharePoint
         }
       }
 
-    private async void btnSignOut_Click(object sender, EventArgs e)
-      {
-      var accounts = await _clientApp.GetAccountsAsync();
-      if (accounts.Any())
-        {
-        try
-          {
-          //await App.PublicClientApp.RemoveAsync(accounts.FirstOrDefault());
-          await _clientApp.RemoveAsync(_clientApp.GetAccountsAsync().Result.FirstOrDefault());
-          //await _clientApp.RemoveAsync(accounts.FirstOrDefault());
-          this.edResultText.Text = "User has signed-out";
-          //this.CallGraphButton.Visibility = Visibility.Visible;
-          //this.SignOutButton.Visibility = Visibility.Collapsed;
-          }
-        catch (MsalException ex)
-          {
-          edResultText.Text = $"Error signing-out user: {ex.Message}";
-          }
-        }
-      }
     }
   }

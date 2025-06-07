@@ -1087,11 +1087,6 @@
             Use broker on Linux
             </summary>
         </member>
-        <member name="F:Microsoft.Identity.Client.BrokerOptions.OperatingSystems.OSX">
-            <summary>
-            Use broker on OSX
-            </summary>
-        </member>
         <member name="M:Microsoft.Identity.Client.BrokerOptions.#ctor(Microsoft.Identity.Client.BrokerOptions.OperatingSystems)">
             <summary>
             Constructor
@@ -1121,9 +1116,9 @@
         </member>
         <member name="P:Microsoft.Identity.Client.BrokerOptions.ListOperatingSystemAccounts">
             <summary>
-            Currently supported on Windows, Linux and macOS
+            Currently only supported on Windows and Linux
             Allows the Windows broker to list Work and School accounts as part of the <see cref="M:Microsoft.Identity.Client.ClientApplicationBase.GetAccountsAsync"/>
-            Linux and macOS broker will discover accounts as part of the <see cref="M:Microsoft.Identity.Client.ClientApplicationBase.GetAccountsAsync"/>
+            Linux broker will discover accounts as part of the <see cref="M:Microsoft.Identity.Client.ClientApplicationBase.GetAccountsAsync"/>
             </summary>        
         </member>
         <member name="T:Microsoft.Identity.Client.EmbeddedWebViewOptions">
@@ -2049,8 +2044,7 @@
             </summary>
             <param name="httpClientFactory">HTTP client factory</param>
             <param name="retryOnceOn5xx">Configures MSAL to retry on 5xx server errors. When enabled (on by default), MSAL will wait 1 second after receiving
-            a 5xx error and then retry the http request again.
-            When disabled, the developer will be responsible for configuring their own retry policy in their custom IMsalHttpClientFactory.</param>
+            a 5xx error and then retry the http request again.</param>
             <remarks>MSAL does not guarantee that it will not modify the HttpClient, for example by adding new headers.
             Prior to the changes needed in order to make MSAL's httpClients thread safe (https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/pull/2046/files),
             the httpClient had the possibility of throwing an exception stating "Properties can only be modified before sending the first request".
@@ -2384,7 +2378,7 @@
             See https://openid.net/specs/openid-connect-core-1_0.html#Terminology
             </summary>
             <remarks>
-            Do not use this method with Entra ID authorities (e.g. https://login.microsoftonline.com/common).
+            Do not use this method with Entra ID authorities (e.g. https://login.microsfoftonline.com/common).
             Use WithAuthority(string) instead.
             </remarks>
         </member>
@@ -2599,27 +2593,6 @@
             </summary>
             <param name="x509Certificate2">The certificate to be used for MTLS authentication.</param>
             <returns>An HttpClient instance configured with the specified certificate.</returns>
-        </member>
-        <member name="T:Microsoft.Identity.Client.IMsalSFHttpClientFactory">
-            <summary>
-            Factory responsible for creating HttpClient with a custom server certificate validation callback.
-            This is useful for the Service Fabric scenario where the server certificate validation is required using the server cert.
-            See https://learn.microsoft.com/dotnet/api/system.net.http.httpclient?view=net-7.0#instancing for more details.
-            </summary>
-            <remarks>
-            Implementations must be thread safe. 
-            Do not create a new HttpClient for each call to <see cref="M:Microsoft.Identity.Client.IMsalSFHttpClientFactory.GetHttpClient(System.Func{System.Net.Http.HttpRequestMessage,System.Security.Cryptography.X509Certificates.X509Certificate2,System.Security.Cryptography.X509Certificates.X509Chain,System.Net.Security.SslPolicyErrors,System.Boolean})"/> - this leads to socket exhaustion.
-            If your app uses Integrated Windows Authentication, ensure <see cref="P:System.Net.Http.HttpClientHandler.UseDefaultCredentials"/> is set to true.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.Identity.Client.IMsalSFHttpClientFactory.GetHttpClient(System.Func{System.Net.Http.HttpRequestMessage,System.Security.Cryptography.X509Certificates.X509Certificate2,System.Security.Cryptography.X509Certificates.X509Chain,System.Net.Security.SslPolicyErrors,System.Boolean})">
-            <summary>
-            Method returning an HTTP client that will be used to validate the server certificate through the provided callback.
-            This method is useful when custom certificate validation logic is required, 
-            for the managed identity flow running on a service fabric cluster.
-            </summary>
-            <param name="validateServerCert">Callback to validate the server certificate for the Service Fabric.</param>
-            <returns>An HTTP client configured with the provided server certificate validation callback.</returns>
         </member>
         <member name="T:Microsoft.Identity.Client.TelemetryAudienceType">
             <summary>
@@ -3012,7 +2985,7 @@
             </summary>
             <remarks>
             Experimental on public clients.
-            Do not use this method with Entra ID authorities (e.g. https://login.microsoftonline.com/common).
+            Do not use this method with Entra ID authorities (e.g. https://login.microsfoftonline.com/common).
             Use WithAuthority(string) instead.
             </remarks>
         </member>
@@ -4638,24 +4611,16 @@
              also not access DefaultRequestHeaders because the getters are not thread safe (use HttpRequestMessage.Headers instead).
              </remarks>
         </member>
-        <member name="M:Microsoft.Identity.Client.Http.HttpManager.#ctor(Microsoft.Identity.Client.IMsalHttpClientFactory,System.Boolean)">
+        <member name="M:Microsoft.Identity.Client.Http.HttpManager.#ctor(Microsoft.Identity.Client.IMsalHttpClientFactory,Microsoft.Identity.Client.Http.IRetryPolicy)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.Identity.Client.Http.HttpManager"/> class.
+            A new instance of the HTTP manager with a retry *condition*. The retry policy hardcodes: 
+            - the number of retries (1)
+            - the delay between retries (1 second)
             </summary>
-            <param name="httpClientFactory">
-            An instance of <see cref="T:Microsoft.Identity.Client.IMsalHttpClientFactory"/> used to create and manage <see cref="T:System.Net.Http.HttpClient"/> instances.
-            This factory ensures proper reuse of <see cref="T:System.Net.Http.HttpClient"/> to avoid socket exhaustion.
-            </param>
-            <param name="disableInternalRetries">
-            A boolean flag indicating whether the HTTP manager should enable retry logic for transient failures.
-            </param>
-            <exception cref="T:System.ArgumentNullException">
-            Thrown when <paramref name="httpClientFactory"/> is null.
-            </exception>
         </member>
         <member name="T:Microsoft.Identity.Client.Http.HttpManagerFactory">
             <summary>
-            Factory to return the instance of HttpManager based on type of MSAL application.
+            Factory to return the instance of HttpManager based on retry configuration and type of MSAL application.
             </summary>
         </member>
         <member name="M:Microsoft.Identity.Client.Http.HttpRetryConditions.ManagedIdentity(Microsoft.Identity.Client.Http.HttpResponse,System.Exception)">
@@ -4672,7 +4637,7 @@
             <param name="exception"></param>
             <returns></returns>
         </member>
-        <member name="M:Microsoft.Identity.Client.Http.IHttpManager.SendRequestAsync(System.Uri,System.Collections.Generic.IDictionary{System.String,System.String},System.Net.Http.HttpContent,System.Net.Http.HttpMethod,Microsoft.Identity.Client.Core.ILoggerAdapter,System.Boolean,System.Security.Cryptography.X509Certificates.X509Certificate2,System.Func{System.Net.Http.HttpRequestMessage,System.Security.Cryptography.X509Certificates.X509Certificate2,System.Security.Cryptography.X509Certificates.X509Chain,System.Net.Security.SslPolicyErrors,System.Boolean},System.Threading.CancellationToken,Microsoft.Identity.Client.Http.IRetryPolicy,System.Int32)">
+        <member name="M:Microsoft.Identity.Client.Http.IHttpManager.SendRequestAsync(System.Uri,System.Collections.Generic.IDictionary{System.String,System.String},System.Net.Http.HttpContent,System.Net.Http.HttpMethod,Microsoft.Identity.Client.Core.ILoggerAdapter,System.Boolean,System.Security.Cryptography.X509Certificates.X509Certificate2,System.Net.Http.HttpClient,System.Threading.CancellationToken,System.Int32)">
             <summary>
             Method to send a request to the server using the HttpClient configured in the implementation.
             </summary>
@@ -4683,9 +4648,9 @@
             <param name="logger">Logger from the request context.</param>
             <param name="doNotThrow">Flag to decide if MsalServiceException is thrown or the response is returned in case of 5xx errors.</param>
             <param name="mtlsCertificate">Certificate used for MTLS authentication.</param>
-            <param name="validateServerCertificate">Callback to validate the server cert for service fabric managed identity flow.</param>
+            <param name="customHttpClient">Custom http client which bypasses the HttpClientFactory. 
+            This is needed for service fabric managed identity where a cert validation callback is added to the handler.</param>
             <param name="cancellationToken"></param>
-            <param name="retryPolicy">Retry policy to be used for the request.</param>
             <param name="retryCount">Number of retries to be attempted in case of retriable status codes.</param>
             <returns></returns>
         </member>
@@ -6044,13 +6009,6 @@
             Detects and returns the managed identity source available on the environment.
             </summary>
             <returns>Managed identity source detected on the environment if any.</returns>
-        </member>
-        <member name="M:Microsoft.Identity.Client.ManagedIdentity.AbstractManagedIdentity.GetValidationCallback">
-            <summary>
-            Method to be overridden in the derived classes to provide a custom validation callback for the server certificate.
-            This validation is needed for service fabric managed identity endpoints.
-            </summary>
-            <returns>Callback to validate the server certificate.</returns>
         </member>
         <member name="T:Microsoft.Identity.Client.ManagedIdentity.ManagedIdentityClient">
             <summary>

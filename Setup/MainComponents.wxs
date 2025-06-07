@@ -7,7 +7,7 @@
         <File Source="ToInstall\VisioAddInSharePoint.vsto" />
         <File Source="ToInstall\VisioAddInSharePoint.dll.manifest" />
       </Component>
-      <Component Id="RegistryEntries" Directory="TARGETDIR">
+      <Component Id="RegistryEntriesAddin" Directory="TARGETDIR">
         <RegistryKey Root="HKCU" Key="Software\Microsoft\Visio\Addins\!(bind.Property.ProductName)">
           <RegistryValue Name="Description" Value="!(bind.Property.ProductName)" Type="string" />
           <RegistryValue Name="FriendlyName" Value="!(bind.Property.ProductName)" Type="string" />
@@ -15,6 +15,19 @@
           <RegistryValue Name="Manifest" Value="file:///[INSTALLDIR]!(bind.Property.ProductName).vsto|vstolocal" Type="string" />
         </RegistryKey>
       </Component>
-      </ComponentGroup>
+      <Component Id="RegistryEntriesApplication" Directory="TARGETDIR">
+        <RegistryKey Root="HKCU" Key="Software\ShareVisual\!(bind.Property.ProductName)">
+          <RegistryValue Name="ClientApplicationId" Value="" Type="string" />
+          <RegistryValue Name="ParentFolder" Value="" Type="string" />
+          <RegistryValue Name="RootFolder" Value="" Type="string" />
+          <RegistryValue Name="SiteUrl" Value="" Type="string" />
+          <RegistryValue Name="TenantId" Value="" Type="string" />
+          <RegistryValue Name="TenantUrl" Value="" Type="string" />
+        </RegistryKey>
+      </Component>
+      <Component Id="DeleteFile" Guid="423EFBFF-6F78-48A8-BAD1-5E80CCFFACFF">
+        <RemoveFile On="uninstall" Name="*.*"/>
+      </Component>
+    </ComponentGroup>
   </Fragment>
 </Wix>
